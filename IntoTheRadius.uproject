@@ -342,46 +342,6 @@
 		{
 			"Name": "DatasmithFBXImporter",
 			"Enabled": false
-		},
-		{
-			"Name": "DataTableNodes",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/bf757f99df98416583f94695d456adda"
-		},
-		{
-			"Name": "BlueprintJson",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/4d3abe312cef4826999700204bb4d52e"
-		},
-		{
-			"Name": "JsonXmlHelper",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/69f737d5e17041079d05044e705f4bee"
-		},
-		{
-			"Name": "DTBPJson",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/48b9478c7f9d47c09c830e2c31818fd1"
-		},
-		{
-			"Name": "CircularDependenciesDetector",
-			"Enabled": false,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/698a2106995e41cb934ada3bb0088a5f"
-		},
-		{
-			"Name": "VictoryBPLibrary",
-			"Enabled": true,
-			"MarketplaceURL": "http://www.ue4code.com"
-		},
-		{
-			"Name": "EditorCameraPosition",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/9864b623739f4fbab30f4d877b137fc9"
-		},
-		{
-			"Name": "NodeGraphAssistant",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/d9baaaeadeaf41dcb52b3f6e134e9514"
 		}
 	],
 	"TargetPlatforms": [

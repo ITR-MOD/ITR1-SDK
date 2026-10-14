@@ -1,0 +1,34 @@
+#pragma once
+#include "Util/SemVersion.h"
+
+#include "ModMetadataObject.h"
+#include "Interfaces/IPluginManager.h"
+#include "Widgets/SWindow.h"
+
+class SAlpakitEditModDialog : public SWindow
+{
+public:
+	SLATE_BEGIN_ARGS(SAlpakitEditModDialog) {}
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs, TSharedRef<IPlugin> InMod);
+
+	FString GetSMLDependencyVersion() const;
+	void SetSMLDependencyVersion(FString Version) const;
+	void UpdateGameVersionTarget();
+
+	static FString FormatGameVersionRange(const FVersionRange& Range);
+
+	bool HasCPP();
+	
+private:
+	TSharedPtr<IPlugin> Mod;
+	bool bRemapPluginContentToGame = false;
+	UModMetadataObject* MetadataObject = nullptr;
+	FVersion GameVersion;
+	FVersionRange ModGameVersionRange;
+	FVersionRange TargetGameVersionRange;
+	
+	FReply OnOkClicked();
+	FReply OnCPPClicked();
+};

@@ -1,0 +1,47 @@
+# Source SDK repository: keep the project and build inputs.
+/*
+!/.gitignore
+!/.gitattributes
+!/*.uproject
+!/LICENSE*
+!/README*
+!/Source/
+!/Config/
+!/Plugins/
+!/Build/
+!/Script/
+!/Scripts/
+
+# Unreal generated output, including nested plugins.
+**/Binaries/
+**/Intermediate/
+**/Saved/
+**/DerivedDataCache/
+**/Content/
+**/.vs/
+**/.idea/
+**/.vscode/
+**/obj/
+**/bin/
+
+# Generated project files, symbols, logs, and local backups.
+*.sln
+*.suo
+*.VC.db
+*.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.pdb
+*.obj
+*.pch
+*.log
+*.tmp
+*.bak
+*.bak[0-9]*
+*~
+Thumbs.db
+.DS_Store
+
+# Local dump samples are not plugin build inputs.
+/Plugins/*/BPA_BaseItem.json

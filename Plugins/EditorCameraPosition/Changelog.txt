@@ -1,0 +1,30 @@
+###### 1.1.2
+* Fixed module LoadingPhase
+
+###### 1.1.1
+* Updated uplugin to support FAB
+
+###### 1.1.0
+* Added option to show/modify/copy/paste the editor camera rotation as well.
+* Added settings in Editor Preferences for enabling/disabling editor camera position/rotation functions
+  and for changing the way the values are truncated.
+* GetEditorCameraRotation and SetEditorCameraRotation Blueprint functions for Editor Utility Blueprints added.
+
+###### 1.0.6
+* GetEditorCameraPosition and SetEditorCameraPosition Blueprint functions for Editor Utility Blueprints added.
+
+###### 1.0.5
+* Fixed setting up coordinates when piloting camera.
+
+###### 1.0.4
+* Added support for large world coordinates.
+
+###### 1.0.3
+* Moved editor config to the default ini file. The project based ini file edition doesn't work for UE5.4.
+* Truncate camera position in the camera position box.
+
+###### 1.0.2
+* Fixed the keyboard shortcut to toggle camera position box.
+
+###### 1.0.1
+* Fixes for UE5.

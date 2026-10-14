@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- init section is always evaluated once per architecture -->
+  <trace enable="true"/>
+  <init>
+    <log text="HapticsManager_APL init"/>
+  </init>
+
+  <androidManifestUpdates>
+	  <setElement result="bhapticsPackage" value="package"/>
+	  <addAttribute tag="$bhapticsPackage" name="android:name" value="com.bhaptics.player"/>
+	  <addElement tag="queries" name="bhapticsPackage"/>
+
+
+	  <addPermission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+	  <addPermission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+
+	  <addPermission android:name="android.permission.BLUETOOTH_CONNECT" android:minSdkVersion="31"/>
+  </androidManifestUpdates>
+
+  <!-- optional additions to proguard -->
+  <proguardAdditions>
+    <insert>
+      <![CDATA[
+      -keepattributes Signature
+      -dontskipnonpubliclibraryclassmembers
+
+     -keepclassmembers class com.epicgames.ue4.GameActivity {
+            public <methods>;
+            public <fields>;
+     }
+	 -keep class com.bhaptics.** {
+		*;
+	}
+    ]]>
+    </insert>
+  </proguardAdditions>
+
+  <prebuildCopies>
+    <log text="Copying bhaptics aar files"/>
+    <copyFile src="$S(PluginDir)/Libraries/bhaptics_ble.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_ble.aar" />
+    <copyFile src="$S(PluginDir)/Libraries/bhaptics_commons.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_commons.aar" />
+    <copyFile src="$S(PluginDir)/Libraries/bhaptics_core.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_core.aar" />
+    <copyFile src="$S(PluginDir)/Libraries/bhaptics_manager.aar"
+            dst="$S(BuildDir)/gradle/bhaptics_manager.aar" />
+  </prebuildCopies>
+
+  <AARImports>
+  </AARImports>
+
+  <buildGradleAdditions>
+    <insert>
+      dependencies {
+      implementation files('../bhaptics_ble.aar')
+      implementation files('../bhaptics_core.aar')
+      implementation files('../bhaptics_commons.aar')
+      implementation files('../bhaptics_manager.aar')
+      }
+    </insert>
+  </buildGradleAdditions>
+
+  <!-- optional additions to the GameActivity class in GameActivity.java -->
+  <gameActivityClassAdditions>
+    <insert>
+      <![CDATA[
+    private static final String BHAPTICS_TAG = "bhaptics_WRAPPER";
+    private com.bhaptics.bhapticsmanger.SdkRequestHandler sdkRequestHandler;
+    private String bhapticsApplicationId = "";
+
+    public native void onRefreshPairedInfo();
+
+    private static String DeviceToJsonString(
+            java.util.List<com.bhaptics.service.SimpleBhapticsDevice> devices) {
+        try {
+            org.json.JSONArray jsonArray = new org.json.JSONArray();
+
+            for (com.bhaptics.service.SimpleBhapticsDevice device : devices) {
+                org.json.JSONObject obj = DeviceToJsonObject(device);
+
+                if (obj == null) {
+                    android.util.Log.i(BHAPTICS_TAG, "toJsonString: failed to parse. " + device);
+                    continue;
+                }
+                jsonArray.put(obj);
+            }
+
+            return jsonArray.toString();
+        } catch (Exception e) {
+            android.util.Log.e(BHAPTICS_TAG, "DeviceToJsonString: " + e.getMessage(), e);
+        }
+
+        return "[]";
+    }
+    private static org.json.JSONObject DeviceToJsonObject(com.bhaptics.service.SimpleBhapticsDevice device) {
+        try {
+            org.json.JSONObject obj = new org.json.JSONObject();
+            obj.put("deviceName", device.getDeviceName());
+            obj.put("address", device.getAddress());
+            obj.put("position", device.getPosition());
+            obj.put("connected", device.isConnected());
+            obj.put("paired", device.isPaired());
+            obj.put("audioJackIn", device.isAudioJackIn());
+            obj.put("battery", device.getBattery());
+            return obj;
+        } catch (org.json.JSONException e) {
+            android.util.Log.d(BHAPTICS_TAG, "toJsonObject: " + e.getMessage());
+        }
+        return null;
+    }
+
+    public void AndroidThunkJava_Initialize(String app, String sdkKey, String defaultConfig) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_Initialize: sdkRequestHandler null");
+            return;
+        }
+
+        bhapticsApplicationId = app;
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_Initialize: " + bhapticsApplicationId);
+        sdkRequestHandler.initialize(bhapticsApplicationId, sdkKey, defaultConfig);
+    }
+	
+	public void AndroidThunkJava_InitializeWithPermission(String app, String sdkKey, String defaultConfig, boolean requestPermission) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_InitializeWithPermission: sdkRequestHandler null");
+            return;
+        }
+
+        bhapticsApplicationId = app;
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_InitializeWithPermission: " + bhapticsApplicationId);
+        sdkRequestHandler.initialize(bhapticsApplicationId, sdkKey, defaultConfig, requestPermission);
+    }
+
+    public boolean AndroidThunkJava_IsBhapticsAvailable() {
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_IsBhapticsAvailable: " + bhapticsApplicationId);
+
+        return sdkRequestHandler.isBhapticsUser();
+    }
+
+    public int AndroidThunkJava_Play(String eventId, float intensity, float duration, float angleX, float offsetY) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_Play: sdkRequestHandler null");
+            return -1;
+        }
+
+        return sdkRequestHandler.play(bhapticsApplicationId, eventId, intensity, duration, angleX, offsetY);
+    }
+    
+    public int AndroidThunkJava_PlayDot(int position, int duration, int[] motors) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_PlayDot: sdkRequestHandler null");
+            return -1;
+        }
+
+        return sdkRequestHandler.playMotors(bhapticsApplicationId, position, duration, motors);
+    }
+    
+    public int AndroidThunkJava_PlayPath(int position, int durationMillis, float[] x, float[] y, int[] motors) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_PlayPath: sdkRequestHandler null");
+            return -1;
+        }
+
+        return sdkRequestHandler.playPath(bhapticsApplicationId, position, durationMillis, x, y, motors);
+    }
+	
+    public int AndroidThunkJava_PlayGlove(int position, int[] motorValues, int[] playTimeValues, int[] shapeValues) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_PlayDot: sdkRequestHandler null");
+            return -1;
+        }
+        return sdkRequestHandler.playGlove(bhapticsApplicationId, position, motorValues, playTimeValues, shapeValues);
+    }
+	
+	public int AndroidThunkJava_PlayLoop(String eventId, float intensity, float duration, float offsetAngleX, float offsetY, int interval, int maxCount) {
+	    if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_PlayLoop: sdkRequestHandler null");
+            return -1;
+		}
+		return sdkRequestHandler.playLoop(bhapticsApplicationId, eventId, intensity, duration, offsetAngleX, offsetY, interval, maxCount);
+	}
+
+    public boolean AndroidThunkJava_IsPlayingByEventId(String eventId) {
+        if (sdkRequestHandler == null) {
+            android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_IsPlayingByEventId: sdkRequestHandler null");
+            return false;
+        }
+
+        return sdkRequestHandler.isPlayingByEventId(bhapticsApplicationId, eventId);
+    }
+
+    public boolean AndroidThunkJava_IsPlayingByRequestId(int requestId) {
+        return sdkRequestHandler.isPlayingByRequestId(bhapticsApplicationId, requestId);
+    }
+
+    public boolean AndroidThunkJava_IsPlaying() {
+        return sdkRequestHandler.isAnythingPlaying();
+    }
+
+    public void AndroidThunkJava_SwapPosition(String address) {
+        sdkRequestHandler.togglePosition(address);
+    }
+    public boolean AndroidThunkJava_StopByEventId(String eventId) {
+        return sdkRequestHandler.stopByEventId(bhapticsApplicationId, eventId);
+    }
+    public boolean AndroidThunkJava_StopByRequestId(int requestId) {
+        return sdkRequestHandler.stop(bhapticsApplicationId, requestId);
+    }
+    public boolean AndroidThunkJava_StopAll() {
+        return sdkRequestHandler.stopAll(bhapticsApplicationId);
+    }
+    public String AndroidThunkJava_getDeviceList() {
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_getDeviceList() ");
+        return DeviceToJsonString(sdkRequestHandler.getDeviceList());
+    }
+
+    public void AndroidThunkJava_Ping(String address) {
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_Ping() " + address);
+        sdkRequestHandler.ping(address);
+    }
+
+    public void AndroidThunkJava_PingAll() {
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_PingAll() ");
+        java.util.List<com.bhaptics.service.SimpleBhapticsDevice> deviceList = sdkRequestHandler.getDeviceList();
+
+        for (com.bhaptics.service.SimpleBhapticsDevice device : deviceList) {
+            if (device.isConnected()) {
+                sdkRequestHandler.ping(device.getAddress());
+            }
+        }
+    }
+
+    public String AndroidThunkJava_GetDeviceList() {
+        android.util.Log.d(BHAPTICS_TAG, "AndroidThunkJava_GetDeviceList() ");
+        java.util.List<com.bhaptics.service.SimpleBhapticsDevice> deviceList = sdkRequestHandler.getDeviceList();
+        return DeviceToJsonString(deviceList);
+    }
+    ]]>
+    </insert>
+  </gameActivityClassAdditions>
+
+  <!-- optional additions to GameActivity onCreate metadata reading in GameActivity.java -->
+  <gameActivityReadMetadataAdditions>
+    <insert>
+
+    </insert>
+  </gameActivityReadMetadataAdditions>
+
+  <!-- optional additions to GameActivity onCreate in GameActivity.java -->
+  <gameActivityOnCreateAdditions>
+    <insert>
+      <![CDATA[
+        android.util.Log.d(BHAPTICS_TAG, "onCreate() ");
+        sdkRequestHandler = new com.bhaptics.bhapticsmanger.SdkRequestHandler(this);
+      ]]>
+    </insert>
+  </gameActivityOnCreateAdditions>
+
+  <!-- optional additions to GameActivity onDestroy in GameActivity.java -->
+  <gameActivityOnDestroyAdditions>
+    <insert>
+        <![CDATA[
+        if (sdkRequestHandler != null) {
+            android.util.Log.d(BHAPTICS_TAG, "onDestroy() : ");
+            sdkRequestHandler.quit();
+        }
+      ]]>
+    </insert>
+  </gameActivityOnDestroyAdditions>
+
+
+  <!-- optional additions to GameActivity onStart in GameActivity.java -->
+  <gameActivityOnStartAdditions>
+    <insert>
+
+    </insert>
+  </gameActivityOnStartAdditions>
+
+  <!-- optional additions to GameActivity onStop in GameActivity.java -->
+  <gameActivityOnStopAdditions>
+    <insert>
+
+    </insert>
+  </gameActivityOnStopAdditions>
+
+
+  <!-- optional additions to GameActivity onPause in GameActivity.java	-->
+  <gameActivityOnPauseAdditions>
+    <insert>
+      <![CDATA[
+    ]]>
+    </insert>
+  </gameActivityOnPauseAdditions>
+
+
+  <!-- optional additions to GameActivity onResume in GameActivity.java	-->
+  <gameActivityOnResumeAdditions>
+    <insert>
+        <![CDATA[
+        if (sdkRequestHandler != null) {
+            android.util.Log.d(BHAPTICS_TAG, "refreshPairing() : ");
+            sdkRequestHandler.refreshPairing();
+			onRefreshPairedInfo();
+        }
+      ]]>
+    </insert>
+  </gameActivityOnResumeAdditions>
+
+
+  <!-- optional additions to GameActivity onActivityResult in GameActivity.java -->
+  <gameActivityOnActivityResultAdditions>
+    <insert>
+    </insert>
+  </gameActivityOnActivityResultAdditions>
+
+
+  <!-- optional libraries to load in GameActivity.java before libUE4.so -->
+  <soLoadLibrary>
+  </soLoadLibrary>
+</root>

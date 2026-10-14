@@ -1,0 +1,31 @@
+{
+  "FileVersion": 3,
+  "Version": 2,
+  "VersionName": "2.0.0",
+  "FriendlyName": "Alpakit for ITR",
+  "Description": "Package Into the Radius content mods for UE4.27",
+  "Category": "Modding",
+  "CreatedBy": "Mircea Roata",
+  "CreatedByURL": "",
+  "DocsURL": "https://docs.ficsit.app/",
+  "MarketplaceURL": "",
+  "SupportURL": "",
+  "CanContainContent": false,
+  "IsBetaVersion": false,
+  "IsExperimentalVersion": false,
+  "Installed": false,
+  "Modules": [
+    {
+      "Name": "Alpakit",
+      "Type": "Editor",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "PluginBrowser",
+      "Enabled": true
+    }
+  ],
+  "EnabledByDefault": true
+}

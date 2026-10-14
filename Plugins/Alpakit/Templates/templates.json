@@ -1,0 +1,9 @@
+{
+  "templates": [
+    {
+      "name": "ITR Content Mod",
+      "description": "Content-only Into the Radius mod for UE4.27.",
+      "path": "BlueprintBlank"
+    }
+  ]
+}

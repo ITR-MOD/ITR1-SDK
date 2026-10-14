@@ -1,0 +1,2 @@
+using System;
+namespace Alpakit.Automation { internal static class Compat { public static string RelativePath(string root,string file) { return Uri.UnescapeDataString(new Uri(System.IO.Path.GetFullPath(root).TrimEnd('\\','/') + "/").MakeRelativeUri(new Uri(System.IO.Path.GetFullPath(file))).ToString()).Replace('/',System.IO.Path.DirectorySeparatorChar); } } }
